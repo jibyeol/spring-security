@@ -5,6 +5,7 @@
 <html>
 <head>
 <title> Happy WOrld </title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 
@@ -29,10 +30,20 @@
 		<label for="password">Password</label>
 		<input type="password" id="password" name="password"/>	
 	</p>
-	<%-- <input type="hidden"                        
+
+	<p>
+		Remember Me : <input type="checkbox" name="_spring_security_remember_me" value="true"/>
+	</p>
+	
+	
+	<%--<input type="hidden"
 		name="${_csrf.parameterName}"
-		value="${_csrf.token}"/> --%>
+		value="${_csrf.token}"/>--%>
+
 	<sec:csrfInput />
+
+
+
 	<button type="submit" class="btn">Log in</button>
 </form>
 

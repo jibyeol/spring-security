@@ -6,8 +6,9 @@
         <title>Spring Security Example</title>
     </head>
     <body>
-        <h1>Welcome!</h1>
+        <h1>Welcome! </h1>
 
-        <p>Click <a href="/hello">here</a> to see a greeting.</p>
+        <p>Click <a href="/main">here</a> to go main page.</p>
+        <a href="/register/form">회원가입</a>
     </body>
 </html>

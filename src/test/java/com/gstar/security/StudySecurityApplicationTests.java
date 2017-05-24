@@ -15,16 +15,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class StudySecurityApplicationTests {
-
-	@Test
-	public void testDatabaseNoMem() throws SQLException {
-	    testDatabase("jdbc:h2:test");
-	}
 	
 	@Test
 	public void testDatabaseMem() throws SQLException {
-	    testDatabase("jdbc:h2:mem:test");
-	    aaaa("jdbc:h2:mem:test");
+		//testDatabase("jdbc:h2:mem:test");
 	}
 
 	private void testDatabase(String url) throws SQLException {
@@ -32,12 +26,18 @@ public class StudySecurityApplicationTests {
 	    Connection connection= DriverManager.getConnection(url);
 	    Statement s=connection.createStatement();
 	    try {
-	    	s.execute("CREATE TABLE USERS users(username varchar_ignorecase(50) not null primary key,password varchar_ignorecase(50) not null,enabled boolean not null)");
+	    	s.execute("CREATE TABLE USERS(username varchar_ignorecase(50) not null primary key,password varchar_ignorecase(50) not null,enabled boolean not null)");
+	    	s.execute("create table authorities (username varchar_ignorecase(50) not null,authority varchar_ignorecase(50) not null,constraint fk_authorities_users foreign key(username) references users(username));");
+	    	s.execute("create unique index ix_auth_username on authorities (username,authority);");
+	    	s.execute("insert into users('admin', '1234', true)");
+	    	s.execute("insert into users('user', '1234', true)");
+	    	s.execute("insert into authorities('admin', 'ROLE_ADMIN')");
+	    	s.execute("insert into authorities('user', 'ROLE_USER')");
 	    } catch(SQLException sqle) {
+	    	sqle.printStackTrace();
 	        System.out.println("Table not found, not dropping");
 	    }
-	    s.execute("CREATE TABLE PERSON (ID INT PRIMARY KEY, FIRSTNAME VARCHAR(64), LASTNAME VARCHAR(64))");
-	    PreparedStatement ps=connection.prepareStatement("select * from PERSON");
+	    PreparedStatement ps=connection.prepareStatement("select * from users");
 	    ResultSet r=ps.executeQuery();
 	    if(r.next()) {
 	        System.out.println("data?");

@@ -5,7 +5,7 @@
 <title> Happy WOrld </title>
 </head>
 <body>
-admin 입니다.
+ADMIN 페이지 입니다.
 
 <form action="/logout" method="post">
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
