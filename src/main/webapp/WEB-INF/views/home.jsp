@@ -7,7 +7,7 @@
     </head>
     <body>
         <h1>Welcome! </h1>
-
+<sec:authentication property="principal.username"/> <br>
         <p>Click <a href="/main">here</a> to go main page.</p>
         <a href="/register/form">회원가입</a>
     </body>
