@@ -20,14 +20,10 @@ public class RegisterController {
 	@Autowired AccountRepository accountRepository;
 	@Autowired PasswordEncoder passwordEncoder;
 	
-	@RequestMapping(value="/form", method=RequestMethod.GET)
-	public String registerForm(){
-		return "registerForm";
-	}
-	
 	@RequestMapping(value="/form", method=RequestMethod.POST)
 	public String register(Account account){
 		account.setPassword(passwordEncoder.encode(account.getPassword()));
+		account.addRole("ROLE_USER");
 		accountRepository.save(account);
 		UserDetailsImpl userDetails = new UserDetailsImpl(account);
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

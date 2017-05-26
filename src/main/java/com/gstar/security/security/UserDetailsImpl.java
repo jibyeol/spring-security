@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import com.gstar.security.model.Account;
+import com.gstar.security.model.AccountAuthority;
 
 import lombok.Data;
 
@@ -26,7 +27,8 @@ public class UserDetailsImpl extends User {
 	
 	private static Collection<? extends GrantedAuthority> authorities(Account account) {
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(account.getRole()));
+		for(AccountAuthority role : account.getRoles())
+			authorities.add(new SimpleGrantedAuthority(role.getRole()));
 		return authorities;
 	}
 

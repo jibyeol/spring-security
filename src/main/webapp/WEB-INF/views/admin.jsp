@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title> Happy WOrld </title>
+<title>ADMIN</title>
 </head>
 <body>
 ADMIN 페이지 입니다.
@@ -11,7 +11,6 @@ ADMIN 페이지 입니다.
 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 	<input type="submit" value="로그아웃">
 </form>
-
 
 </body>
 </html>

@@ -16,12 +16,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.gstar.security.security.AuthSuccessHandler;
 import com.gstar.security.security.CookieAuthenticationFilter;
@@ -48,15 +46,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-        .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        	.sessionManagement()
+            	.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		/*
+		 * SessionCreationPolicy
+		 * 
+		 * ALWAYS : 항상 HpptSession을 만듦
+		 * If_REQUEST : 요청시에만 HttpSession을 만듦
+		 * NEVER : HttpSession을 만들지 않지만 이미 존재하는 경우만 사용됨?
+		 * STATELESS : HttpSession을 만들지 않고 
+		 * 			   SecurityContext를 만들기 위해 HttpSession을 사용하지 않음
+		 */
 		
 		http
 			.authorizeRequests() // http.authorizeRequests() 자식이 여러개 있고 선언 된 순서대로 간주됨.
 				.antMatchers("/", "/home", "/register/**").permitAll()
 				.antMatchers("/admin").hasRole("ADMIN") // hasRole 메소드 호출해서 접두어 없어도 됨
 				.antMatchers("/db/**").access("hasRole('ADMIN') and hasRole('DBA')")
-				.anyRequest().authenticated()
+				.anyRequest().hasRole("USER")
 				.and()
 			.formLogin()
 				.loginPage("/login")
@@ -64,19 +71,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.successHandler(authSuccessHandler())
 				.and()
 			.logout()
-				//.logoutUrl("/custom/logout") // logout URL 바꿀 수 있음
-				//.logoutSuccessUrl("/custom/main") // logout 성공시 redirect될 주소 (default : login?logout)
-				//.logoutSuccessHandler(logoutSuccessHandler()) // logout 성공시 호출됨. 이거 있으면 .logoutSuccessUrl 무시됨
-				//.invalidateHttpSession(true) // 로그아웃시 HttpSession을 무효화할지 여부 (default : true)
-				//.addLogoutHandler(logoutHandler) // SecurityContextLogoutHandler는 기본적으로 마지막 logoutHandler로 추가됨
-				//.deleteCookie(cookieNamesToClear) // 로그아웃 성공시 삭제할 쿠키의 이름 지정
+				.deleteCookies(cookieService.getCookieName()) // 로그아웃 성공시 삭제할 쿠키의 이름 지정
 				.permitAll();
+		
 		http.rememberMe().key(REMEMBER_ME_KEY).rememberMeServices(persistentTokenBasedRememberMeService());
+		
 		http.exceptionHandling().accessDeniedPage("/403");
 		
-		/**
-		 * LogoutHandler -- http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#jc-logout-handler
-		 */
+		http.addFilterBefore(getCookieAuthenticationFilter(), LogoutFilter.class);
 	}
 	
 	@Override
@@ -84,8 +86,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
 	
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		/* [in memory]
+		 auth
+			.inMemoryAuthentication()
+				.withUser("admin").password("1234").roles("ADMIN")
+				.and()
+				.withUser("user").password("1234").roles("USER")
+				.and()
+				.withUser("dbo").password("1234").roles("ADMIN", "DBO");
+		*/
+		/* [jdbc]
+		auth.jdbcAuthentication().dataSource(dataSource);
+		*/
+		
+		// cutomizing
+		auth.userDetailsService(userDetailsService);
+	}
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
+		// 스프링 시큐리티에서 기본적으로 사용하는 암호화 방식으로 암화화가 될때마다 새로운 값을 생성한다.
+		// 임의적인 값을 추가해서 암호화하지 않아도 된다.
 		return new BCryptPasswordEncoder();
 	}
 
@@ -104,7 +127,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return jdbcTokenRepository;
 	}
 
-	@Bean
+	@Bean // https://docs.spring.io/spring-security/site/docs/current/apidocs/org/springframework/security/web/authentication/rememberme/TokenBasedRememberMeServices.html
 	public TokenBasedRememberMeServices tokenBasedRememberMeServices(){
 		TokenBasedRememberMeServices tokenBasedRememberMeServices = 
 				new TokenBasedRememberMeServices(REMEMBER_ME_KEY, userDetailsService);
@@ -112,49 +135,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return tokenBasedRememberMeServices;
 	}
 	
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService);
-	}
-	
-	private UsernamePasswordAuthenticationFilter getUsernamePasswordAuthenticationFilter(){
-		UsernamePasswordAuthenticationFilter filter = new UsernamePasswordAuthenticationFilter();
-		filter.setAllowSessionCreation(false);
-		//filter.setAuthenticationManager(getAuthenticationManager());
-		filter.setAuthenticationSuccessHandler(authSuccessHandler());
-		filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error"));
-		filter.setFilterProcessesUrl("/j_spring_security_check");
-		
-		return filter;
-	}
-	
-	/*@Bean(name="springSecurityFilterChain")
-	public FilterChainProxy getFilterChainProxy(){
-		SecurityFilterChain chain = new SecurityFilterChain(){
-
-			@Override
-			public boolean matches(HttpServletRequest request) {
-				return true;
-			}
-
-			@Override
-			public List<Filter> getFilters() {
-				List<Filter> filters = new ArrayList<Filter>();
-				
-				filters.add(getCookieAuthenticationFilter());
-				
-				return filters;
-			}
-			
-		};
-		return new FilterChainProxy(chain);
-	}
-*/
-	@Bean
 	public Filter getCookieAuthenticationFilter() {
 		return new CookieAuthenticationFilter(userDetailsService, cookieService);
 	}
-
+	
 	@Bean
 	public AuthenticationSuccessHandler authSuccessHandler() {
 		AuthenticationSuccessHandler handler = new AuthSuccessHandler(cookieService);

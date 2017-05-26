@@ -48,7 +48,6 @@ public class CookieAuthenticationFilter extends GenericFilterBean {
 		return username != null
 				? new CookieSecurityContext(userDetailsService.loadUserByUsername(username))
 				: SecurityContextHolder.createEmptyContext();
-		//return SecurityContextHolder.createEmptyContext();
 	}
 
 }

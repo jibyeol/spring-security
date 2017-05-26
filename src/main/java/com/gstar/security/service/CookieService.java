@@ -22,5 +22,9 @@ public class CookieService {
 	public Cookie createCookie(String principal) {
 		return new Cookie(cookieName, principal);
 	}
+	
+	public String getCookieName(){
+		return cookieName;
+	}
 
 }

@@ -29,7 +29,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
 		String principal = ((UserDetailsImpl) principalObj).getUsername();
 		
 		response.addCookie(cookieService.createCookie(principal));
-		response.sendRedirect("/home");
+		response.sendRedirect("/");
 	}
 
 }
