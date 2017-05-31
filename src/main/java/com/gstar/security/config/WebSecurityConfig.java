@@ -20,6 +20,9 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.servlet.view.JstlView;
 
 import com.gstar.security.security.AuthSuccessHandler;
 import com.gstar.security.security.CookieAuthenticationFilter;
@@ -27,6 +30,10 @@ import com.gstar.security.service.CookieService;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled=true)
+// WebSecurityConfigurerAdapter를 상속받은 클래스에 @EnableWebSecurity 어노테이션을
+// 명시하면 springSecurityFilterChain가 자동으로 포함된다.
+// @EnableWebSecurity : HttpSecurity 설정 제공 <http></http>를 찾을 수 있음
+// @EnableGlobalMethodSecurity : AOP security on methods (PreAuthorize, PostAuthorize)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired UserDetailsService userDetailsService;
@@ -40,7 +47,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     {
         webSecurity
             .ignoring()
-                .antMatchers("/console/**");
+                .antMatchers("/console/**", "/WEB-INF/**");
+        /*
+         * https://stackoverflow.com/questions/20053107/spring-security-invalid-remember-me-token-series-token-mismatch-implies-previ
+         * /WEB-INF/**
+         * 이거 추가한 이유는 연속으로 2번 요청을 보낼경우 CookieTheftException이 발생하는데,
+         * 보니까 로그인페이지로 예를들면
+         * 		/login
+         * 		/WEB-INF/views/login.jsp
+         * 위의 경로로 두번 요청을 보내고 있음... 왜이런지는 나두 잘... 모룸....
+         */
     }
 	
 	@Override
@@ -143,6 +159,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationSuccessHandler authSuccessHandler() {
 		AuthenticationSuccessHandler handler = new AuthSuccessHandler(cookieService);
 		return handler;
+	}
+	
+	@Bean
+	public ViewResolver getViewResolver(){
+	    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+	    resolver.setPrefix("/WEB-INF/views/");
+	    resolver.setSuffix(".jsp");
+	    resolver.setViewClass(JstlView.class);
+	    return resolver;
 	}
 
 }
