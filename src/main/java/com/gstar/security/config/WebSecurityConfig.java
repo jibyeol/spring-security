@@ -47,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     {
         webSecurity
             .ignoring()
-                .antMatchers("/console/**", "/WEB-INF/**");
+                .antMatchers("/console/**", "/WEB-INF/**", "sign-in/**");
         /*
          * https://stackoverflow.com/questions/20053107/spring-security-invalid-remember-me-token-series-token-mismatch-implies-previ
          * /WEB-INF/**

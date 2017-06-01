@@ -33,6 +33,11 @@ public class Account implements Serializable {
 	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinColumn(name="account_id")
 	List<AccountAuthority> roles;
+	
+	String mail;
+	String auth;
+	String authType;
+	String authId;
 
 	public void addRole(String role) {
 		if(roles == null){

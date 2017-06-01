@@ -25,7 +25,7 @@ public class UserDetailsImpl extends User {
 		this.nick = account.getNick();
 	}
 	
-	private static Collection<? extends GrantedAuthority> authorities(Account account) {
+	public static Collection<? extends GrantedAuthority> authorities(Account account) {
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		for(AccountAuthority role : account.getRoles())
 			authorities.add(new SimpleGrantedAuthority(role.getRole()));

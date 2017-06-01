@@ -45,7 +45,7 @@ public class OAuth2ClientConfig {
 	}
 	
 	@Bean
-	@ConfigurationProperties("naver.clinet")
+	@ConfigurationProperties("naver.client")
 	AuthorizationCodeResourceDetails naver(){
 		return new AuthorizationCodeResourceDetails();
 	}

@@ -21,7 +21,7 @@ public class UserTokenServices extends UserInfoTokenServices {
 
 		@Override
 		public List<GrantedAuthority> extractAuthorities(Map<String, Object> arg0) {
-			return AuthorityUtils.createAuthorityList(RoleType.OAUTH.toString());
+			return AuthorityUtils.createAuthorityList("USER");
 		}
 		
 	}
