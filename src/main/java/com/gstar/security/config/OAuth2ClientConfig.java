@@ -7,7 +7,6 @@ import javax.servlet.Filter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +42,7 @@ public class OAuth2ClientConfig {
 	ResourceServerProperties facebookResource(){
 		return new ResourceServerProperties();
 	}
-	
+	/*
 	@Bean
 	@ConfigurationProperties("naver.client")
 	AuthorizationCodeResourceDetails naver(){
@@ -55,7 +54,7 @@ public class OAuth2ClientConfig {
 	ResourceServerProperties naverResource(){
 		return new ResourceServerProperties();
 	}
-	
+	*/
 	@Bean
 	FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter){
 		FilterRegistrationBean registration = new FilterRegistrationBean();
@@ -73,7 +72,7 @@ public class OAuth2ClientConfig {
 		facebook.setTokenServices(new UserTokenServices(facebookResource().getUserInfoUri(), facebook().getClientId()));
 		facebook.setAuthenticationSuccessHandler(new OAuth2SuccessHandler("facebook", accountService));
 		filters.add(facebook);
-		
+		/*
 		// naver
 		OAuth2ClientAuthenticationProcessingFilter naver
 			= new OAuth2ClientAuthenticationProcessingFilter("/sign-in/naver");
@@ -81,7 +80,7 @@ public class OAuth2ClientConfig {
 		naver.setTokenServices(new UserTokenServices(naverResource().getUserInfoUri(), naver().getClientId()));
 		naver.setAuthenticationSuccessHandler(new OAuth2SuccessHandler("naver", accountService));
 		filters.add(naver);
-	
+		 */
 		CompositeFilter filter = new CompositeFilter();
 		filter.setFilters(filters);
 		return filter;

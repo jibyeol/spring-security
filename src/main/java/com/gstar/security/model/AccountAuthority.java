@@ -4,7 +4,11 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.Data;
 
@@ -15,9 +19,11 @@ public class AccountAuthority implements Serializable {
 	private static final long serialVersionUID = 726192372896037304L;
 	
 	@Id
-	@Column(name="account_id")
+	@GeneratedValue
 	private Long id;
-	@Id
+	
+	@Column(name="account_id")
+	private int accountId;
 	private String role;
 
 	public AccountAuthority(){}

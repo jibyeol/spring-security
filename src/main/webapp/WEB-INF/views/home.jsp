@@ -7,6 +7,26 @@
         <title>Spring Security Example</title>
     </head>
     <body>
+	    <script>
+		  window.fbAsyncInit = function() {
+		    FB.init({
+		      appId      : '1866032073414276',
+		      cookie     : true,
+		      xfbml      : true,
+		      version    : 'v2.8'
+		    });
+		    FB.AppEvents.logPageView();   
+		  };
+		
+		  (function(d, s, id){
+		     var js, fjs = d.getElementsByTagName(s)[0];
+		     if (d.getElementById(id)) {return;}
+		     js = d.createElement(s); js.id = id;
+		     js.src = "//connect.facebook.net/en_US/sdk.js";
+		     fjs.parentNode.insertBefore(js, fjs);
+		   }(document, 'script', 'facebook-jssdk'));
+		</script>
+		
         <h1>Welcome! </h1>
         
 		<sec:authorize access="isAuthenticated()">
@@ -30,6 +50,20 @@
 		<sec:authorize access="hasRole('USER')">
 			USER 권한이 있습니다.<br>
 		</sec:authorize>
-
+		
+		<br><br>
+		facebook:<fb:login-button scope="public_profile,email" onlogin="checkLoginState();"><input type="button" value="facebook"></fb:login-button>
+		
+		<script>
+			function checkLoginState() {
+			  FB.getLoginStatus(function(response) {
+				statusChangeCallback(response);
+			  });
+			}
+			
+			function statusChangeCallback(response){
+				console.log(response);
+			}
+		</script>
     </body>
 </html>

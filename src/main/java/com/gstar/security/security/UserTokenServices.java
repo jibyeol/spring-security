@@ -8,8 +8,6 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoT
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-import com.gstar.security.model.RoleType;
-
 public class UserTokenServices extends UserInfoTokenServices {
 
 	public UserTokenServices(String userInfoEndpointUrl, String clientId) {
@@ -21,7 +19,7 @@ public class UserTokenServices extends UserInfoTokenServices {
 
 		@Override
 		public List<GrantedAuthority> extractAuthorities(Map<String, Object> arg0) {
-			return AuthorityUtils.createAuthorityList("USER");
+			return AuthorityUtils.createAuthorityList("USER", "OAUTH");
 		}
 		
 	}

@@ -2,6 +2,7 @@ package com.gstar.security.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,9 +14,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 public class Account implements Serializable {
 
@@ -30,8 +35,8 @@ public class Account implements Serializable {
 	private String password;
 	private String nick;
 	
-	@OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-	@JoinColumn(name="account_id")
+	@OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name="member_id")
 	List<AccountAuthority> roles;
 	
 	String mail;
@@ -44,5 +49,16 @@ public class Account implements Serializable {
 			roles = new ArrayList<AccountAuthority>();
 		}
 		roles.add(new AccountAuthority(id, role));
+	}
+
+	public Account(String userId, String nick, Collection<? extends GrantedAuthority> authorities, String authType,
+			String authId, boolean noPrefix) {
+		this.userId = userId;
+		this.nick = nick;
+		for(GrantedAuthority role : authorities){
+			addRole("ROLE_" + role.getAuthority());
+		}
+		this.authType = authType;
+		this.authId = authId;
 	}
 }
